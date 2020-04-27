@@ -1,1 +1,74 @@
+#!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+# Decorate print() such that (A) it refuses to print anything under ten characters long and
+# (B) only five calls are allowed, and demonstrate these restrictions when the program is run
+import functools
+import sys
+
+# Approach: Create two decorators one for A, one for B & then chain them
+# decorator A :refuse to print anything under ten characters
+
+def printfor(min_chars):  # min_chars is number of character that print refuse to print
+    def decorator_printfor(func):
+        @functools.wraps(func)
+        def wrapper_printfor(*args, **kwargs):
+            result = func(*args, **kwargs)  # take the result
+            if (len(result)) <= min_chars:  # measure its lenght against min_chars
+                return ''  # if under  treshold result is ''
+            else:
+                return func(*args, **kwargs)  # otherwise return it as is
+
+        return wrapper_printfor
+
+    return decorator_printfor
+
+
+# decorator B: allows only five calls
+def count(max_calls):  # max_calls is maximun number of calls allowed
+    def decorator_count(func):
+        @functools.wraps(func)
+        def wrapper_count(*args, **kwargs):
+            wrapper_count.num_calls += 1  # count the calls
+            if wrapper_count.num_calls > max_calls:  # if count reach max_calls exit
+                exit(0)
+            else:  # otherwise continue
+                return func(*args, **kwargs)
+
+        wrapper_count.num_calls = 0
+        return wrapper_count
+
+    return decorator_count
+
+
+# Testing them
+#with a very simple function printit
+#that at the chained profiles
+@count(max_calls=5)
+@printfor(min_chars=10)
+def printit(txt):
+    return(txt)
+
+#from the prompt  provide a file for testing
+#  file  should have :
+# - some lines less than 10 characters long
+# - more than  5 lines
+#catch the name of file to wrap and create a generator
+
+global g
+try:
+    log ="".join(sys.argv[1:]) #get  file for testing from prompt
+    gen = (line for line in open(log))
+    g = gen
+
+except :
+    print("Error occured: no file provided at prompt")
+    print(' WARNING:cmd line should be: pyhton3  programname.py  filetowrap.txt ')
+
+try:
+    while True:
+        print(printit(next(g)))
+
+except StopIteration:  # if stopiteration do not mention it go to finally
+    pass
+
 
