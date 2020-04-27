@@ -1,1 +1,29 @@
+#!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+from math import sin, radians
+'''
+-Assignment: Write a program one statement long that displays the curvature of a sinusoid on the terminal
+-Explantion if I do not have to reduce to one statement
+I will code as follows:
+for r in range(360):  # generate values r from 0 to 360 degrees
+    #generate the sinus value s  for the value of r
+    s = sin(radians(r))
+    # make a string showing the sinus value s for the degree r.
+    # use .ljust to make the string length always the same length what ever the value of  r & s are
+    # this string  ends with no carriage return, print the string
+    print('sin(' + str(r).ljust(4, ' ') + ' deg.' + ')=' + str(round(float(sin(radians(r))), 4)).ljust(7, '0'),
+          end='\t')
+    #generate a value v proportional to the sinus value (v = s*50 ), rounded to no decimal
+    v = round(float(sin(radians(r)) * 50), 0)
+    # make a string  with  v blank spaces ending with a "x"
+    #add this string to the previous printed string on the same line, then add at the end a carriage return
+    #print the string
+    print((int(v) + 60) * " ", end="x\n")
 
+since I have to reduce to one statment I will
+a) suppress the variable  v by replacing it by its calculated value
+b) use comprehension to flatten the for loop to a line
+ a+b allows me the reduce the statment to one line as below
+'''
+print('\n'.join(['sin(' + str(r).ljust(4,' ') + ' deg.'+')=' + str(round(float(sin(radians(r))), 4)).ljust(7,'0') + (
+            int(round(float(sin(radians(r)) * 50), 0)) + 60) * " " + "o" for r in range(0,360,10)]))
