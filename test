@@ -1,1 +1,98 @@
+import unittest
+from datetime import date, datetime, timedelta
+
+
+# HW:Use unittest.TestCase methods to confirm that the addition and subtraction
+# of date and timedelta objects produce correct result
+
+# According Python3.org library  dates & detlatime objects have 5 addition and subtraction  operations:
+# 1: timedelta1 =timedelta2 + timedelta3
+# 2: timedelta1 =timedelta2 - timedelta3
+# 3: date2 = date1 + timedelta
+# 4: date2 = date1 - timedelta
+# 5: timedelta = date1 - date2
+
+class timedelta_operations():  # class for the 5 operations
+    def add_timedelta(t1, t2):
+        if isinstance(t1, timedelta) and isinstance(t2, timedelta):
+            return (t1 + t2)
+        else:
+            raise Exception('Invalid arguments')
+
+    def subtract_timedelta(t1, t2):
+        if isinstance(t1, timedelta) and isinstance(t2, timedelta):
+            return (t1 - t2)
+        else:
+            raise Exception('Invalid arguments')
+
+    def add_date_timedelta(d, t):
+        if isinstance(d, (date, datetime)) and isinstance(t, timedelta):
+            return (d + t)
+        else:
+            raise Exception('Invalid arguments')
+
+    def subtract_date_timedelta(d, t):
+        if isinstance(d, (date, datetime)) and isinstance(t, timedelta):
+            return (d - t)
+        else:
+            raise Exception('Invalid arguments')
+
+
+    def subtract_dates(d1, d2):
+        if (type(d1) == type(d2)):
+            return (d1 - d2)
+        else:
+           raise TypeError('Invalid arguments')
+
+# unitest.TestCase for the the 5 operations
+class ExampleTest(unittest.TestCase):
+
+    def setUp(self):
+        print('nsetUp')
+        # arguments
+        self.t1 = timedelta(hours=24)
+        self.t2 = timedelta(hours=1)
+        self.d1 = date.today()
+        self.d2 = datetime.now()
+
+        # results
+        self.tt1 = timedelta(days=1, hours=1)
+        self.tt2 = timedelta(hours=23)
+        self.tdt1 = (date.today() + timedelta(days=1))
+        self.tdt2 = (date.today() - timedelta(days=1))
+        self.tdd2 = timedelta(hours=0, minutes=0, seconds=0)
+
+    def tearDown(self):
+        print('tearDown')
+
+    def test_add_timedelta(self):
+        print('test_add_timedelta')
+        self.assertEqual(timedelta_operations.add_timedelta(self.t1, self.t2), self.tt1)
+
+    def test_subtract_timedelta(self):
+        print('test_subtract_timedelta')
+        self.assertEqual(timedelta_operations.subtract_timedelta(self.t1, self.t2), self.tt2)
+
+    def test_add_date_timedelta(self):
+        print('test_add_date_timedelta')
+        self.assertEqual(timedelta_operations.add_date_timedelta(self.d1, self.t1), self.tdt1)
+
+    def test_subtract_date_timedelta(self):
+        print('test_subtract_date_timedelta')
+        self.assertEqual(timedelta_operations.subtract_date_timedelta(self.d1, self.t1), self.tdt2)
+
+    def test_subtract_dates(self):
+        print('test_subtract_dates')
+        self.assertEqual(timedelta_operations.subtract_dates(self.d1, self.d1), self.tdd2)
+        with self.assertRaises(TypeError):
+            timedelta_operations.subtract_dates(self.d1, self.d2)
+        with self.assertRaises(TypeError):
+            timedelta_operations.subtract_dates(self.d2, self.d1)
+
+
+
+if __name__ == '__main__':
+    print("\nTesting the 5 the addition and subtraction operations of date and timedelta objects which are :")
+    print("add_date_timedelta; add_timedelta; subtract_date_timedelta; subtract_dates; subtract_timedelta \n")
+    unittest.main(verbosity=2)
 
