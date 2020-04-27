@@ -1,1 +1,38 @@
+#!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+'''
+Homework requirements:
+Write a program to lazily rewrap text from the filename passed so that it fits an 80 column window without breaking any words.
+Use a generator that yields the next lines of text, each containing as many words as possible
+ '''
+import sys
+import textwrap
 
+#catch the name of file to wrap and create a generator
+try:
+    log ="".join(sys.argv[1:])
+    gen = (line for line in open(log))
+
+except :
+    print("Error occured:")
+    print(' WARNING:cmd line should be: pyhton3  programname.py  filetowrap.extension ')
+
+try:
+
+    alltxt=[]#will contained all wrapped lines
+    while True:
+        ln = next(gen)
+        lnj =' '+ (" ".join(ln.split())) #eliminate double spaces and \r,\t ,...ect & place a space at start of a line
+        # wrap the line according the requirments of the home work
+        lnf = textwrap.fill(lnj, width=80, tabsize=1, expand_tabs=False, replace_whitespace=True,
+                            break_long_words=False, break_on_hyphens=False)
+        alltxt.append(lnf)   #append the newly  wrapped line to container for all wrapped lines
+
+except StopIteration: #if stopiteration do not mention it go to finally
+    pass
+finally:
+    alltxt2= ''.join(alltxt)#make a new string of all wrapped lines
+    #wrap the text alltxt2 in order to repsect the require,emts
+    alltxt3 = lnf = textwrap.fill(alltxt2, width=80, tabsize=1, expand_tabs=False, replace_whitespace=True,
+                            break_long_words=False, break_on_hyphens=False)
+    print(alltxt3) #print alltx3 where all wrapped lines are  wrapped according the requirements
