@@ -1,1 +1,134 @@
+#!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+# Write a generator that calculates the number of seconds since midnight for events in access_log,
+# and show the first ten when the program is run
+import calendar
+import re
+datetimeFormat2 = '%d/%b/%Y:%H:%M:%S %z'
+
+def starttoday():
+    # built a today's midnight date with timezone in format similar to log timestamp
+    import time, datetime
+    # find the current time zone & make it a string of the timezone
+    localtz = datetime.timezone(datetime.timedelta(seconds=-time.timezone))
+    localtzl = str(localtz)[3:].split(':')
+    tzstr = localtzl[0] + localtzl[1]
+    # get today date & reformat it with timezone in a string
+    from datetime import date
+    tdl = str(date.today()).split('-')
+    tdstr = tdl[2] + '/' + (calendar.month_abbr[int(tdl[1])]) + '/' + tdl[0] + ':00:00:00 ' + tzstr
+    return (tdstr)
+
+def nbrseconds(timestamp):
+    # alculates the number of seconds since midnight for events in access_log with  correspeoding timestamp date
+    # timezone is taken in account (day ligth saving) for today's midnight & log event
+    import datetime
+    if option == 'A':
+        diff = (datetime.datetime.strptime(startdate, datetimeFormat2)) - (
+        datetime.datetime.strptime(timestamp, datetimeFormat2))
+        print(" =>Seconds:", int(diff.total_seconds()))
+    if option == 'C':
+        diff = (datetime.datetime.strptime(timestamp, datetimeFormat2)) - (
+            datetime.datetime.strptime(midnight, datetimeFormat2))
+        print(" =>Seconds:", int(diff.total_seconds()))
+
+#start main
+startdate = starttoday()  # get startdate
+# print an explanation for the coming list of 10 events
+print("Since I found 3 possible interpretations of \n'since midnight for events in access_log' , I made 3 scripts:")
+print (" Script # A:  midgnight is Today\'s midnight  ")
+print (" Script # B:  midgnight is the event\'s midnight  ")
+print (" Script # C:  midgnight is the 1st event\'s midnight  ")
+#################################################################
+print("=======SCRIPT A: midgnight is Today\'s midnight=======")
+print('List of the first 10 log events with their times in seconds * ')
+print('Since Today\'s midnight which is: ', startdate)
+option ="A"
+# set path of the file
+log = '/etc/httpd/logs/access_log'
+
+nb = 10  # fix the number of lines to scan
+ct = 0  # create a counter for the number of timestamps found
+# start3 =timer() #note the start time
+gen = (line for line in open(log))  # create a generator for reading the line of the file
+# use the generator to go line by line up to nb lines
+while ct < nb:
+    # search the time stamp which is in the 1st brackets [] using regex in the next line of the generator
+    match = re.search('\[(.*?)\]', next(gen))
+    if match is not None:
+        print(match.group(1), end='\t')  # if  found it print it
+        nbrseconds(match.group(1))  # calculate the number of second between today midnight & curren timestamp
+        ct = ct + 1  # increase counter by 1
+
+    else:
+        break  # stop no more lines
+
+print(f"{ct} timestamps shown with number of seconds since today\'s midnight.")
+print('*Note: For the seconds calculation time zones are taken into account for both timestamps')
+#####################################################################################
+print("=======SCRIPT B: midgnight is the event\'s midnight=======")
+#give the path of the file
+log = '/etc/httpd/logs/access_log'
+
+#create a generator
+gen =(line for line in   open(log))
+#use the generator to go line by line up to 10 lines
+for ct  in range(10):
+    gn = next(gen) # get next from generator
+    #search the time stamp which is in the 1st brackets [] using regex in the next line of the generator
+    match = re.search('\[(.*?)\-', gn) # get the timestamp
+    match2 = re.search('\:(.*?)\-',gn) # get the time from the timestamp
+    #if  time stamp found print it
+    if  match is not None:  #if  time stamp found print it
+       print(match.group(1)+ '->time in seconds since midnight same day:', end='\t')
+       t1 =(match2.group(1)).split(":") #make a list of the time to split in hour,minutes , seconds
+       print((1*int(t1[2]) + 60*(int(t1[1]))+3600*int(t1[0]))) #convert hr,min,sec in sec.Sum then & print
+       ct = ct + 1
+    else :
+        #stop no more lines
+        break
+
+#at the end prntt the number of lines/time stamps shown
+print(f"{ct} timestamps have been shown with number of seconds since their own midnight")
+#######################################################################
+print("=======SCRIPT C: midgnight is the 1st event\'s midnight=======")
+log = '/etc/httpd/logs/access_log'
+nb = 10  # fix the number of lines to scan
+ct = 0  # create a counter for the number of timestamps found
+#print('List of the first 10 log events with their times in seconds* since the midnight of the first even')
+gen = (line for line in open(log))  # create a generator for reading the line of the file
+option ="C"
+# use the generator to go line by line up to nb lines
+while ct < nb:
+    # search the time stamp which is in the 1st brackets [] using regex in the next line of the generator
+    match = re.search('\[(.*?)\]', next(gen))
+    if match is not None:
+
+        if ct == 0:
+            #calculate the midnigh's of the 1st event
+            split1=(match.group(1).split('/'))
+            day1=((match.group(1).split('/'))[0])
+            month1= split1[1]
+            year1 = (split1[2].split(':'))[0]
+            tz=(((split1[2].split(':'))[3]).split(' ') ) [1]
+            midnight =(day1 +'/'+month1+'/'+year1+':00:00:00 '+tz)
+            print('List of the first 10 log events with their times in seconds* since the midnight of the first even')
+            print('The midnight of the first even is:', midnight)
+            print(match.group(1),end='\t')
+            #print(' =>Seconds', end='\t')
+            match2 = re.search('\:(.*?)\-', match.group(1))  # get the time from the timestamp
+            t1 = (match2.group(1)).split(":")  # make a list of the time to split in hour,minutes , seconds
+            sumit=(1 * int(t1[2]) + 60 * (int(t1[1])) + 3600 * int(t1[0])) # convert hr,min,sec in sec.Sum then
+            print(' =>Seconds:',sumit)
+           
+        else :
+            print(match.group(1), end='\t')  # if  found it print it
+            nbrseconds(match.group(1)) #find duration in seconds & print it
+        ct = ct + 1  # increase counter by 1
+
+    else:
+        break  # stop no more lines
+
+print(f"\n{ct} timestamps shown with number of seconds since 1st event\'s midnight.")
+print('*Note: For the seconds calculation time zones are taken into account for both timestamps\n')
 
