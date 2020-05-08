@@ -1,1 +1,10 @@
+"""
+Write a universal wrapper program that expects its command line arguments
+to contain the absolute path to any program, followed by its arguments.
+The wrapper should run that program and report its exit value.
+"""
+import subprocess, sys
+
+process = subprocess.run(sys.argv[1:],stdout=subprocess.PIPE,universal_newlines=True)
+print(process.stdout)
 
