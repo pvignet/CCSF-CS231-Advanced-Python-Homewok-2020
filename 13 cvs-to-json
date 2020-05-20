@@ -1,1 +1,53 @@
+#!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+import http.server
+'''
+Assignment:Write a CSV-to-JSON translator that expects a CSV file as argument, 
+and for each line, prints out a JSON object encapsulating that record 
+'''
+import sys
+import csv
+import json
+import random
+import os
+
+
+#verify that a csv file is passed at the prompt
+if len(sys.argv) < 2:
+    print("No file at the prompt, please retry")
+    exit(0)
+cf ="".join(sys.argv[1])
+if not cf.endswith('.csv'):
+    print("File passed at the prompt does not have a .csv extension, please retry")
+    exit(0)
+print('Name of csv file passed at prompt :'+cf)
+#open csv file
+csvfile = open(cf, 'r')
+#find columns' headers
+colnames=(csvfile.readline()).split(',')
+#remove any carriage return on last element
+colnames[-1] = colnames[-1].strip()
+#create a json filename
+jf='json'+str(random.randrange(100,999))+'.json'
+#create & populate jasonfile with csvfile's data
+jsonfile = open(jf, 'w')
+reader = csv.DictReader( csvfile, colnames)
+print("\nPrinting JSON object encapsulating the record for each line")
+for row in reader:
+    print(row)
+    json.dump(row, jsonfile)
+    jsonfile.write('\n')
+#close all files
+csvfile.close()
+jsonfile.close()
+#print the json file for verification
+print("\nReading & printing the new JSON file named:",jf, end='\n\t')
+jsonfile= open(jf, 'r')
+lns=jsonfile.readlines()
+for ln in lns:
+    print(ln, end='\t')
+#close json file
+jsonfile.close()
+# delete json file
+os.remove(jf)
 
